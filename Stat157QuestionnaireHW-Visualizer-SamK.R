@@ -45,7 +45,8 @@ languagesVector=c()
 for(line in 1:length(languagesList)){
   langs=as.vector(strsplit(x=as.matrix(languagesList[line]),split=","))
   print(langs[[1]])
-  languagesVector=c(languagesVector,langs[[1]])
+  langs=gsub(" ","",langs[[1]])
+  languagesVector=c(languagesVector,langs)
 }
 uniqueLangs=unique(languagesVector)
 uniqueFreqs=c()

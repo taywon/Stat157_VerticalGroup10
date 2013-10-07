@@ -9,22 +9,21 @@
 load("C:/Users/Sam Kirschner/Downloads/stat157dataset.RData")
 
 
+
 ###Learning Style Visualization###
+
 #Select out the columns for learning style, with integers for scores
-     
 visual=nnd[[3]]
 aural=nnd[[4]]
 readWrite=nnd[[5]]
-kinesthetic=nnd[[6]]
-     
-
-
+kinesthetic=nnd[[6]]     
 
 #Go through each person's responses, and figure out what their strongest score was for. The number in the vector is visual,
 #the second is aural, the third is readWrite, and the fourth is kinesthetic. 
 
 #Find Highest score for each person
 topStyles=c()
+
 #Also track how many programming languages each learning type knows
 languages=nnd[[2]] 
 langNumbers=c()
@@ -50,8 +49,9 @@ xStyle="Learning Style"
 #plot them together on a histogram so you can see the spread of people's learning style
 hist(topStyles,0:length(unique(topStyles)),col=c(turqoise,blue,purple,red),labels=styleLabels,ylim=c(0,20),main=styleTitle,xlab=xStyle)
 
-###Programming Language and Learning Style Visualization###
 
+
+###Programming Language and Learning Style Visualization###
 
 #A plot of learning styles versus the number of languages people know can be telling too
 #You can see that the spread isn't really dependent on learning style (aural doesn't have many students or observations)
@@ -62,8 +62,8 @@ plot(topStyles,langNumbers,main=plotTitle,xlab=xLabel,ylab=yLabel)
 
 
 
-
 ###Programming Language Visualization###
+
 #This part requires the wordcloud package to be installed to R. You can do so using the following command:
 #install.packages("wordcloud")
 #Load it using the following command:
@@ -81,6 +81,7 @@ for(line in 1:length(languagesList)){
   langs=gsub(" ","",langs[[1]])
   languagesVector=c(languagesVector,langs)
 }
+
 #now, find the subset of all the unique languages that people know, and their frequencies among students
 uniqueLangs=unique(languagesVector)
 uniqueFreqs=c()

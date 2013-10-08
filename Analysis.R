@@ -1,5 +1,13 @@
+nnd1=nnd[,3:6]
+nnd2=nnd[,2]
+data1=cbind(nnd1,nnd2)
 
-#Before run this code, set y=lang and x=(visual, aural, read.wrtie, kinesthetic)
+y=as.matrix(as.numeric(data1$nnd2))
+x=matrix(0,31,4)
+x[,1]=as.numeric(data1[,1])
+x[,2]=as.numeric(data1[,2])
+x[,3]=as.numeric(data1[,3])
+x[,4]=as.numeric(data1[,4])
 
 #Lang VS Visual
 mod1=lm(y~x[,1])

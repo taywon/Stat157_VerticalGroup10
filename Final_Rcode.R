@@ -12,26 +12,29 @@
 # R programming language.                                        #
 ##################################################################
 
-
 ##################################################################
-### Download & Install requried package                          #
+### Download requried packages                                   #
 #                                                                #
-#  1.download Rcurl package to have an access to google api      #
-#  2.install package into local R repository                     #
-#  3.obtain a data from google spread sheet                      #
+#  Important: once you run this section, do not run it again     #
+#  1.'RCurl' package will allow us to access Google spreadsheet  #
+#  2.'worldcloud' package will provide our wordcolud plot        #
 ##################################################################
 
 install.packages('RCurl')     #**once you run, please do not run this line again.
-install.packages("wordcloud") #**once you run, please do not run this line again.
+install.packages('wordcloud') #**once you run, please do not run this line again.
+
+##################################################################
+### Install requried packages & Download the data                #
+#                                                                #
+#  1.install package into local R repository                     #
+#  2.obtain a data from google spread sheet                      #
+##################################################################
 
 library(RCurl)            #loading packages
-library("wordcloud")       #loading packages
+library(wordcloud)        #loading packages
 options(RCurlOptions = list(cainfo = system.file('CurlSSL', 'cacert.pem', package = 'Rcurl')))
-
 url.="https://docs.google.com/spreadsheet/pub?key=0Amx5sIkwVHb7dG1oWVVOUlVRdDZ3aUt6c2RLUFBLVkE&output=csv"
-
 myCsv = getURL(url.,cainfo = system.file("CurlSSL", "cacert.pem", package = "RCurl"))
-
 DATA = read.csv(textConnection(myCsv)) #download the data
 
 ##################################################################
@@ -39,7 +42,7 @@ DATA = read.csv(textConnection(myCsv)) #download the data
 #                                                                #
 # Functions that we made for specific propose                    #
 # 1.datacleaning                                                 #
-# 2.What is your learning style                                  #
+# 2.counting numbers of languages you know                       #
 # 3.assign numerical value to Always, often, not often, never    #
 ##################################################################
 
@@ -58,7 +61,7 @@ datacleaning=function(value){
       if(length(ind)!=0){
         temp2[i]=temp[ind][1]
       }else{
-      temp2[i]=-1
+        temp2[i]=-1
       }
     }
   }
@@ -67,15 +70,15 @@ datacleaning=function(value){
 
 extract=function(data){
   out=0
-for(i in 1:48){
-  temp=unique(strsplit(data,split=" ")[[i]])[length(unique(strsplit(data,split=" ")[[i]]))]
-  if(is.na(temp)==1){
-    out[i]=-1
-  }else{
-    out[i]=temp
-  }
-} 
-    out2=as.numeric(out)
+  for(i in 1:48){
+    temp=unique(strsplit(data,split=" ")[[i]])[length(unique(strsplit(data,split=" ")[[i]]))]
+    if(is.na(temp)==1){
+      out[i]=-1
+    }else{
+      out[i]=temp
+    }
+  } 
+  out2=as.numeric(out)
   return(out2)
 }
 
@@ -97,7 +100,6 @@ assignValue=function(data){
       }
     }
   }
-
   producer=nd[,1]
   administrator=nd[,2]
   entrepreneur=nd[,3]
@@ -147,17 +149,12 @@ ind=as.logical(as.numeric(c.new.v==-1)*
 
 #subsetting the data
 sub_data2=cbind(as.character(DATA$How.often.do.you.take.the.following.roles.in.group.projects...A.producer..This.person.knows.how.to.get.the.job.done.A.a0..),
-                 as.character(DATA$How.often.do.you.take.the.following.roles.in.group.projects...An.administrator..He.or.she.is.able.to.plan.and.organize..),
-                 as.character(DATA$How.often.do.you.take.the.following.roles.in.group.projects...An.integrator..This.person.can.take.an.individual.goal.and.transform.it.into.a.group.goal.A.a0..),
-                 as.character(DATA$How.often.do.you.take.the.following.roles.in.group.projects...An.entrepreneur..This.individual.has.vision.and.creative.problem.solving.abilities..))
-  
-
-
-
+                as.character(DATA$How.often.do.you.take.the.following.roles.in.group.projects...An.administrator..He.or.she.is.able.to.plan.and.organize..),
+                as.character(DATA$How.often.do.you.take.the.following.roles.in.group.projects...An.integrator..This.person.can.take.an.individual.goal.and.transform.it.into.a.group.goal.A.a0..),
+                as.character(DATA$How.often.do.you.take.the.following.roles.in.group.projects...An.entrepreneur..This.individual.has.vision.and.creative.problem.solving.abilities..))
 
 #Final data set
 F_dset=data.frame(new.lang,c.new.v,c.new.a,c.new.r,c.new.k,assignValue(sub_data2))[!ind,]
-
 
 
 ##################################################################
@@ -165,7 +162,9 @@ F_dset=data.frame(new.lang,c.new.v,c.new.a,c.new.r,c.new.k,assignValue(sub_data2
 #                                                                #
 # Do simple and multi- linear regression to see if there is      #
 # linear relationship with numbers of languages you know and     #
-# your learning style                                            #
+# your learning style. Futhermore, we used stepwise method to    #
+# see if there are other vairables that could have               #
+# linear relationship with numbers of langagues you know         # 
 ##################################################################
 
 #set location
@@ -178,7 +177,7 @@ plot(new.lang~c.new.v,data=F_dset,ylab="Lang",xlab="Visual",pch=16,col='blue')
 title("Languages vs Visual", sub = "P-value 0.2872 | Corr=0.1973719",
       cex.main = 2,   font.main= 4, col.main= "black",
       cex.sub = 0.75, font.sub = 3, col.sub = "red")
-abline(mod1,col='red')
+abline(mod1,col='red') #fitting regression line on our plot
 
 #model2 regress new.lang on c.new.a
 mod2=lm(new.lang~c.new.a,data=F_dset)
@@ -187,7 +186,7 @@ plot(new.lang~c.new.a,F_dset,ylab="Lang",xlab="Aural",col='blue',pch=16)
 title("Languages vs Aural", sub = "P-value 0.5748 | Corr=0.1047782",
       cex.main = 2,   font.main= 4, col.main= "black",
       cex.sub = 0.75, font.sub = 3, col.sub = "red")
-abline(mod2,col='red')
+abline(mod2,col='red') #fitting regression line on our plot
 
 #model3 regress new.lang on c.new.r
 mod3=lm(new.lang~c.new.r,data=F_dset)
@@ -196,7 +195,7 @@ plot(new.lang~c.new.r,F_dset,ylab="Lang",xlab="Read/Write",col='blue',pch=16)
 title("Languages vs Read/write", sub = "P-value 0.7804 | Corr=0.05218476",
       cex.main = 2,   font.main= 4, col.main= "black",
       cex.sub = 0.75, font.sub = 3, col.sub = "red")
-abline(mod3,col='red')
+abline(mod3,col='red') #fitting regression line on our plot
 
 #model4 regress new.lang on c.new.k
 mod4=lm(new.lang~c.new.k,data=F_dset)
@@ -205,14 +204,14 @@ plot(new.lang~c.new.k,F_dset,ylab="Lang",xlab="Kinesthetic",col='blue',pch=16)
 title("Languages vs Kinesthetic", sub = "P-value 0.5328 | Corr=0.11642303",
       cex.main = 2,   font.main= 4, col.main= "black",
       cex.sub = 0.75, font.sub = 3, col.sub = "red")
-abline(mod4,col='red')
+abline(mod4,col='red') #fitting regression line on our plot
 
 #model5 regress new.lang on c.new.v+c.new.a+c.new.r+c.new.k
 mod5=lm(new.lang~c.new.v+c.new.a+c.new.r+c.new.k,data=F_dset)
 summary(mod5)
 
 #using stepwise method to find the variables. In particular, trying to find 
-#linear combination of the variables which has strong relationship with 
+#linear combination of the variables which have strong relationship with 
 #number of languages you know. 
 mod0=lm(new.lang~-1,data=F_dset)
 mod6=lm(new.lang~.,data=F_dset)
@@ -220,16 +219,23 @@ B=step(mod0, scope=list(lower=mod0, upper=mod6), direction="forward",data=F_dset
 summary(B) #model is significant. 
 
 ##################################################################
-### visualization                                                #
+### Visualization Overview                                              #
 #                                                                #
-# all the code is generalized so that you can understand         #
+# All the code is generalized so that you can understand         #
 # how you would implement this for larger sets of data           #
 # when trying to visualize the same characteristics              #
 ##################################################################
 
 
-#Go through each person's responses, and figure out what their strongest score was for. The number in the vector is visual,
-#the second is aural, the third is readWrite, and the fourth is kinesthetic. 
+##################################################################
+### Visualization -Histogram                                     #
+#                                                                #
+# Go through each person's responses, and figure out what        #
+# their strongest score was for. The number in the vector is     #
+# visual,the second is aural, the third is readWrite, and        #
+# the fourth is kinesthetic.                                     #
+##################################################################
+
 
 #Find Highest score for each person
 topStyles=c()
@@ -243,7 +249,6 @@ for(response in 1:length(F_dset$c.new.v)){
   row=c(F_dset$c.new.v[response],F_dset$c.new.a[response],F_dset$c.new.r[response],F_dset$c.new.k[response])
   topStyles=c(topStyles,which(row==max(row)))
   langNumbers=c(langNumbers,rep(languages[response],length(which(row==max(row)))))
-  
 }
 
 #Choose some pretty colors that work well together for a histogram
@@ -256,23 +261,24 @@ red=colors()[448]
 styleLabels=c("visual","aural","reading/ writing","kinesthetic")
 styleTitle="Histogram of Top Learning Styles in Stat 157"
 xStyle="Learning Style"
+
 #plot them together on a histogram so you can see the spread of people's learning style
 hist(topStyles,0:length(unique(topStyles)),col=c(turqoise,blue,purple,red),labels=styleLabels,ylim=c(0,20),main=styleTitle,xlab=xStyle)
 
 
+##################################################################
+### Visualization -wordcloud + piechart                          #
+#                                                                #
+# A plot of learning styles versus the number of languages       # 
+# people know can be telling too. You can see that the spread    # 
+# isn't really dependent on learning style. (aural doesn't       #
+# have many students or observations)                            #
+##################################################################
 
-###Programming Language and Learning Style Visualization###
-
-#A plot of learning styles versus the number of languages people know can be telling too
-#You can see that the spread isn't really dependent on learning style (aural doesn't have many students or observations)
 plotTitle="Coding Languages Known Per Learning Type"
 xLabel="Visual, Aural, Reading/Writing, and Kinesthetic Learning Styles"
 yLabel="Number of Programming Languages Known"
 plot(topStyles,langNumbers,main=plotTitle,xlab=xLabel,ylab=yLabel,xaxt='n')
-
-
-
-###Programming Language Visualization###
 
 #Select out the languages from the data
 languagesList=as.character(DATA$What.computer.language.s..do.you.know.)
